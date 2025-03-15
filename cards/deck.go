@@ -35,9 +35,15 @@ func (d deck) toString() string {
 	return strings.Join([]string(d), ",")
 }
 
-func (d deck) saveToFile(fileName string) error {
+func getWd() (string, error) {
 	// get current working directory
 	wd, err := os.Getwd()
+	return wd, err
+}
+
+func (d deck) saveToFile(fileName string) error {
+	// get current working directory
+	wd, err := getWd()
 	if err != nil {
 		return err
 	}
@@ -48,4 +54,22 @@ func (d deck) saveToFile(fileName string) error {
 	}
 	// save to new directory
 	return os.WriteFile(wd+"\\output\\"+fileName, []byte(d.toString()), 0666)
+}
+
+func newDeckFromFile(fileName string) deck {
+	wd, err := getWd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+		return nil
+	}
+	// get []byte from file
+	byteSlice, err := os.ReadFile(wd + "\\output\\" + fileName)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+		return nil
+	}
+	// convert to string -> []string -> deck
+	return deck(strings.Split(string(byteSlice), ","))
 }
